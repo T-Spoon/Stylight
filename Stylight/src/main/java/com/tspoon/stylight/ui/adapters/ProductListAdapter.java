@@ -1,6 +1,7 @@
 package com.tspoon.stylight.ui.adapters;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
@@ -30,8 +31,7 @@ public class ProductListAdapter extends ArrayAdapter<Product> {
     private Picasso mPicasso;
 
     private final int mColorSale;
-    private final int mImageWidth;
-    private final int mImageHeight;
+    private final int mImageSize;
 
     public ProductListAdapter(Context context, int resource, List<Product> objects) {
         super(context, resource, objects);
@@ -39,8 +39,13 @@ public class ProductListAdapter extends ArrayAdapter<Product> {
         mInflator = LayoutInflater.from(context);
         mPicasso = Picasso.with(context);
         mColorSale = context.getResources().getColor(android.R.color.holo_red_dark);
-        mImageWidth = context.getResources().getDimensionPixelSize(R.dimen.product_image_width);
-        mImageHeight = context.getResources().getDimensionPixelSize(R.dimen.product_image_height);
+
+        int rotationType = context.getResources().getConfiguration().orientation;
+        if (rotationType == Configuration.ORIENTATION_LANDSCAPE) {
+            mImageSize = context.getResources().getDimensionPixelSize(R.dimen.product_image_size_landscape);
+        } else {
+            mImageSize = context.getResources().getDimensionPixelSize(R.dimen.product_image_size_portrait);
+        }
     }
 
     @Override
@@ -64,9 +69,9 @@ public class ProductListAdapter extends ArrayAdapter<Product> {
         String primaryImage = product.getPrimaryImage();
         if (primaryImage != null) {
             if (product.isSale()) {
-                mPicasso.load(primaryImage).resize(mImageWidth, mImageHeight).into(holder.productImage);
+                mPicasso.load(primaryImage).resize(mImageSize, mImageSize).into(holder.productImage);
             } else {
-                mPicasso.load(primaryImage).resize(mImageWidth, mImageHeight).transform(mGreyscaleTransformation).into(holder.productImage);
+                mPicasso.load(primaryImage).resize(mImageSize, mImageSize).transform(mGreyscaleTransformation).into(holder.productImage);
             }
         }
 

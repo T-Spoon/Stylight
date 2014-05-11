@@ -9,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
@@ -29,6 +31,9 @@ public class FragmentProducts extends Fragment {
     private LinearLayout mProgressView;
     private GridView mGridView;
 
+    private Request loginRequest;
+    private Request dataRequest;
+
     public static FragmentProducts newInstance() {
         FragmentProducts fragment = new FragmentProducts();
 
@@ -40,13 +45,22 @@ public class FragmentProducts extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle bundle = savedInstanceState == null ? getArguments() : savedInstanceState;
         if (bundle != null) {
-
         }
 
-        login();
-
         setHasOptionsMenu(true);
-        //setListAdapter();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        login();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (loginRequest != null) loginRequest.cancel();
+        if (dataRequest != null) dataRequest.cancel();
     }
 
     @Override
@@ -61,6 +75,10 @@ public class FragmentProducts extends Fragment {
         mProgressView = (LinearLayout) view.findViewById(R.id.progress_bar_holder);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -85,7 +103,7 @@ public class FragmentProducts extends Fragment {
     }
 
     private void login() {
-        Api.getInstance(getActivity()).login(new JacksonRequestListener() {
+        loginRequest = Api.getInstance(getActivity()).login(new JacksonRequestListener() {
             @Override
             public void onResponse(Object response, int statusCode, VolleyError error) {
                 if (response != null) {
@@ -93,6 +111,7 @@ public class FragmentProducts extends Fragment {
                 } else {
                     Log.e(TAG, "An error occurred while parsing the data. Status: " + statusCode);
                     if (error != null) error.printStackTrace();
+                    Toast.makeText(getActivity(), R.string.error_network, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -106,7 +125,7 @@ public class FragmentProducts extends Fragment {
     private void refresh() {
         if (!isRefreshing) {
             setListShown(false);
-            Api.getInstance(getActivity()).fetchProducts(mProductsResponseListener);
+            dataRequest = Api.getInstance(getActivity()).fetchProducts(mProductsResponseListener);
             isRefreshing = true;
         }
     }
@@ -118,12 +137,13 @@ public class FragmentProducts extends Fragment {
                 if (mGridView != null) {
                     mGridView.setAdapter(new ProductListAdapter(getActivity(), 0, response.getProductList()));
                 }
-                isRefreshing = false;
-                setListShown(true);
             } else {
                 Log.e(TAG, "An error occurred while parsing the data. Status: " + statusCode);
                 if (error != null) error.printStackTrace();
+                Toast.makeText(getActivity(), R.string.error_network, Toast.LENGTH_LONG).show();
             }
+            isRefreshing = false;
+            setListShown(true);
         }
 
         @Override

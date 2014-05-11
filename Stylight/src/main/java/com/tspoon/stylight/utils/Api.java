@@ -28,17 +28,19 @@ public class Api {
         return sInstance;
     }
 
-    public void login(JacksonRequestListener listener) {
+    public Request login(JacksonRequestListener listener) {
         String username = "Tspoon";
         String passwd = "iamapassword";
 
         String url = String.format(URL_LOGIN, username, passwd);
         SecureRequest request = new SecureRequest(Request.Method.POST, url, listener);
         mRequestQueue.add(request);
+        return request;
     }
 
-    public void fetchProducts(JacksonRequestListener listener) {
+    public Request fetchProducts(JacksonRequestListener listener) {
         SecureRequest request = new SecureRequest(Request.Method.GET, URL_PRODUCTS, listener);
         mRequestQueue.add(request);
+        return request;
     }
 }
