@@ -10,7 +10,7 @@ import com.spothero.volley.JacksonRequestListener;
 public class Api {
 
     private static final String URL_LOGIN = "http://api.stylight.com/api/login?username=%s&passwd=%s";
-    private static final String URL_PRODUCTS = "http://api.stylight.de/api/products";
+    private static final String URL_PRODUCTS = "http://api.stylight.de/api/products?request_locale=de_DE&sale=true&sortBy=popularity&pageItems=89";
     private static Api sInstance;
 
     private RequestQueue mRequestQueue;
