@@ -12,17 +12,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 import com.tspoon.stylight.R;
 import com.tspoon.stylight.model.Product;
+import com.tspoon.stylight.model.ProductPair;
 import com.tspoon.stylight.utils.Formatter;
 
 import java.util.List;
 
-public class ProductListAdapter extends ArrayAdapter<Product> {
+public class ProductListAdapter extends ArrayAdapter<ProductPair> implements View.OnClickListener {
 
     private final String TAG = "ProductListAdapter";
 
@@ -33,7 +36,7 @@ public class ProductListAdapter extends ArrayAdapter<Product> {
     private final int mColorSale;
     private final int mImageSize;
 
-    public ProductListAdapter(Context context, int resource, List<Product> objects) {
+    public ProductListAdapter(Context context, int resource, List<ProductPair> objects) {
         super(context, resource, objects);
         mContext = context;
         mInflator = LayoutInflater.from(context);
@@ -50,22 +53,46 @@ public class ProductListAdapter extends ArrayAdapter<Product> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        ViewHolder holderOne, holderTwo;
         if (convertView == null) {
             convertView = mInflator.inflate(R.layout.list_item_product, parent, false);
-            holder = new ViewHolder();
-            holder.productImage = (ImageView) convertView.findViewById(R.id.product_image);
-            holder.productBrand = (TextView) convertView.findViewById(R.id.product_brand);
-            holder.productName = (TextView) convertView.findViewById(R.id.product_name);
-            holder.productPrice = (TextView) convertView.findViewById(R.id.product_price);
-            holder.productPriceSale = (TextView) convertView.findViewById(R.id.product_price_sale);
-            convertView.setTag(holder);
+            holderOne = new ViewHolder();
+            holderOne.productContainer = (LinearLayout) convertView.findViewById(R.id.product_container_one);
+            holderOne.productImage = (ImageView) holderOne.productContainer.findViewById(R.id.product_image);
+            holderOne.productBrand = (TextView) holderOne.productContainer.findViewById(R.id.product_brand);
+            holderOne.productName = (TextView) holderOne.productContainer.findViewById(R.id.product_name);
+            holderOne.productPrice = (TextView) holderOne.productContainer.findViewById(R.id.product_price);
+            holderOne.productPriceSale = (TextView) holderOne.productContainer.findViewById(R.id.product_price_sale);
+
+            holderTwo = new ViewHolder();
+            holderTwo.productContainer = (LinearLayout) convertView.findViewById(R.id.product_container_two);
+            holderTwo.productImage = (ImageView) holderTwo.productContainer.findViewById(R.id.product_image);
+            holderTwo.productBrand = (TextView) holderTwo.productContainer.findViewById(R.id.product_brand);
+            holderTwo.productName = (TextView) holderTwo.productContainer.findViewById(R.id.product_name);
+            holderTwo.productPrice = (TextView) holderTwo.productContainer.findViewById(R.id.product_price);
+            holderTwo.productPriceSale = (TextView) holderTwo.productContainer.findViewById(R.id.product_price_sale);
+
+            convertView.setTag(R.id.key_holder_one, holderOne);
+            convertView.setTag(R.id.key_holder_two, holderTwo);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            holderOne = (ViewHolder) convertView.getTag(R.id.key_holder_one);
+            holderTwo = (ViewHolder) convertView.getTag(R.id.key_holder_two);
         }
 
-        Product product = getItem(position);
+        ProductPair pair = getItem(position);
 
+        populateView(pair.getProductOne(), holderOne);
+        if (pair.getProductTwo() != null) {
+            populateView(pair.getProductTwo(), holderTwo);
+            holderTwo.productContainer.setVisibility(View.VISIBLE);
+        } else {
+            holderTwo.productContainer.setVisibility(View.INVISIBLE);
+        }
+
+        return convertView;
+    }
+
+    private void populateView(Product product, ViewHolder holder) {
         String primaryImage = product.getPrimaryImage();
         if (primaryImage != null) {
             if (product.isSale()) {
@@ -89,10 +116,23 @@ public class ProductListAdapter extends ArrayAdapter<Product> {
             holder.productPriceSale.setText("");
         }
 
-        return convertView;
+        holder.productContainer.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.product_container_one:
+                Toast.makeText(mContext, "Left Item", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.product_container_two:
+                Toast.makeText(mContext, "Right Item", Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 
     private static class ViewHolder {
+        LinearLayout productContainer;
         ImageView productImage;
         TextView productBrand;
         TextView productName;

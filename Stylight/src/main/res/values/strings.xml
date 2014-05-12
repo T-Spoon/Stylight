@@ -6,4 +6,6 @@
     <string name="error_network">Problem loading data</string>
     <string name="action_refresh">Refresh</string>
 
+    <item type="id" name="key_holder_one" />
+    <item type="id" name="key_holder_two" />
 </resources>

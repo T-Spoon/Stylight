@@ -11,6 +11,7 @@ public class Api {
 
     private static final String URL_LOGIN = "http://api.stylight.com/api/login?username=%s&passwd=%s";
     private static final String URL_PRODUCTS = "http://api.stylight.de/api/products?request_locale=de_DE&sale=true&sortBy=popularity&pageItems=89";
+    private static final String URL_PRODUCTS_NO_SALE = "http://api.stylight.de/api/products";
     private static Api sInstance;
 
     private RequestQueue mRequestQueue;
